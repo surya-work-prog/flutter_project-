@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "413144913514",
+    "project_id": "the-bridal-touch",
+    "storage_bucket": "the-bridal-touch.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413144913514:android:c57f3c9e5c44c82bf5dc13",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfmdkto4-FZccsevM2g0CNUd5IMiT_Bd8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
