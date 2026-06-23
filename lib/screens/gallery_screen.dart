@@ -1,44 +1,63 @@
 import 'package:flutter/material.dart';
 import '../widgets/navbar.dart';
 import '../widgets/footer.dart';
+import '../widgets/responsive_container.dart';
+import '../utils/responsive.dart';
 
 class GalleryScreen extends StatelessWidget {
   const GalleryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final int columns = Responsive.galleryColumns(context);
+
     return Scaffold(
       appBar: const NavBar(),
+      endDrawer: const AppDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            ResponsiveContainer(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
 
-            const Text(
-              'Gallery',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+                  const Text(
+                    'Gallery',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 6,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          'https://picsum.photos/400?random=$index',
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 30),
+                ],
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(
-                6,
-                (index) => Image.network(
-                  'https://picsum.photos/200?random=$index',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
 
             const Footer(),
           ],

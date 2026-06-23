@@ -1,66 +1,121 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/firestore_service.dart';
 import '../widgets/navbar.dart';
 import '../widgets/footer.dart';
+import '../widgets/responsive_container.dart';
 
 class ServicesScreen extends StatelessWidget {
-  const ServicesScreen({super.key});
+  ServicesScreen({super.key});
+
+  final FirestoreService _firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const NavBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
+      endDrawer: const AppDrawer(),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestoreService.getServices(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            const Text(
-              'Our Services',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text("No services available"),
+            );
+          }
 
-            const SizedBox(height: 20),
+          final docs = snapshot.data!.docs;
 
-            Wrap(
-              spacing: 15,
-              runSpacing: 15,
-              children: const [
-                ServiceCard('Bridal Makeup'),
-                ServiceCard('HD Makeup'),
-                ServiceCard('Party Makeup'),
-                ServiceCard('Engagement Makeup'),
-                ServiceCard('Reception Makeup'),
-                ServiceCard('Hair Styling'),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                ResponsiveContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+
+                      const Center(
+                        child: Text(
+                          "Our Services",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final data =
+                              docs[index].data() as Map<String, dynamic>;
+
+                          final title = data['title'] ?? '';
+                          final description = data['description'] ?? '';
+                          final price = data['price'] ?? '';
+                          final category = data['category'] ?? '';
+
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    description,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    "Category: $category",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "Price: ₹$price",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.pink,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+
+                const Footer(),
               ],
             ),
-
-            const SizedBox(height: 30),
-
-            const Footer(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ServiceCard extends StatelessWidget {
-  final String title;
-
-  const ServiceCard(this.title, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: SizedBox(
-        width: 180,
-        height: 100,
-        child: Center(
-          child: Text(title),
-        ),
+          );
+        },
       ),
     );
   }
