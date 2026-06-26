@@ -10,10 +10,25 @@ class ContactProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // Valid inquiry statuses for admin workflow
+  static const List<String> validStatuses = [
+    'new',
+    'contacted',
+    'booked',
+    'completed',
+    'cancelled',
+  ];
+
   Future<bool> updateContactStatus({
     required String docId,
     required String status,
   }) async {
+    if (!validStatuses.contains(status)) {
+      _errorMessage = 'Invalid status value.';
+      notifyListeners();
+      return false;
+    }
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -25,7 +40,7 @@ class ContactProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to update contact status.';
+      _errorMessage = 'Failed to update inquiry status.';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -66,7 +81,7 @@ class ContactProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to delete contact.';
+      _errorMessage = 'Failed to delete inquiry.';
       _isLoading = false;
       notifyListeners();
       return false;

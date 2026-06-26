@@ -10,15 +10,29 @@ class ServiceProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
   Future<bool> addService({
     required String title,
     required String description,
     required String price,
     required String category,
+    String imageUrl = '',
+    String tag = '',
+    bool isFeatured = false,
+    bool isVisible = true,
+    int displayOrder = 0,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _setError(null);
 
     try {
       await _firestoreService.addService(
@@ -26,15 +40,18 @@ class ServiceProvider extends ChangeNotifier {
         description: description,
         price: price,
         category: category,
+        imageUrl: imageUrl,
+        tag: tag,
+        isFeatured: isFeatured,
+        isVisible: isVisible,
+        displayOrder: displayOrder,
       );
 
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to add service.';
-      _isLoading = false;
-      notifyListeners();
+      _setError('Failed to add service.');
+      _setLoading(false);
       return false;
     }
   }
@@ -45,10 +62,14 @@ class ServiceProvider extends ChangeNotifier {
     required String description,
     required String price,
     required String category,
+    String imageUrl = '',
+    String tag = '',
+    bool isFeatured = false,
+    bool isVisible = true,
+    int displayOrder = 0,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _setError(null);
 
     try {
       await _firestoreService.updateService(
@@ -57,34 +78,99 @@ class ServiceProvider extends ChangeNotifier {
         description: description,
         price: price,
         category: category,
+        imageUrl: imageUrl,
+        tag: tag,
+        isFeatured: isFeatured,
+        isVisible: isVisible,
+        displayOrder: displayOrder,
       );
 
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to update service.';
-      _isLoading = false;
-      notifyListeners();
+      _setError('Failed to update service.');
+      _setLoading(false);
       return false;
     }
   }
 
   Future<bool> deleteService(String docId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _setError(null);
 
     try {
       await _firestoreService.deleteService(docId);
-
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to delete service.';
-      _isLoading = false;
-      notifyListeners();
+      _setError('Failed to delete service.');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> updateServiceVisibility({
+    required String docId,
+    required bool isVisible,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      await _firestoreService.updateServiceVisibility(
+        docId: docId,
+        isVisible: isVisible,
+      );
+
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError('Failed to update service visibility.');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> updateServiceFeatured({
+    required String docId,
+    required bool isFeatured,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      await _firestoreService.updateServiceFeatured(
+        docId: docId,
+        isFeatured: isFeatured,
+      );
+
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError('Failed to update featured status.');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> updateServiceDisplayOrder({
+    required String docId,
+    required int displayOrder,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      await _firestoreService.updateServiceDisplayOrder(
+        docId: docId,
+        displayOrder: displayOrder,
+      );
+
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError('Failed to update service order.');
+      _setLoading(false);
       return false;
     }
   }
